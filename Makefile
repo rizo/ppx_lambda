@@ -13,11 +13,11 @@ run: clean test
 
 
 code:
-	ocamlc -dsource -I lib -ppx $(PPXBIN) $(PPXTEST) -o lambda
+	ocamlc -dsource -I lib -ppx ./ppx_lambda.native ./test_ppx_lambda.ml
 
 
 tree:
-	ocamlc -dparsetree -I lib -ppx $(PPXBIN) $(PPXTEST) -o lambda
+	ocamlc -dparsetree -I lib -ppx ./ppx_lambda.native ./test_ppx_lambda.ml
 
 
 clean:
