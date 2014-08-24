@@ -27,6 +27,25 @@ let getenv_mapper argv =
   { default_mapper with
     expr = fun mapper expr ->
       match expr with
+      (* 0-arity lambda *)
+      | {
+          pexp_desc = Pexp_apply
+          (
+            { pexp_desc = Pexp_ident { txt = Lident "=>" } },
+            ("", { pexp_desc = Pexp_construct ({ txt = Lident "()" }, None) }) ::
+            ("", body) :: rest
+          )
+        }
+        -> print_endline ("** Pexp_apply/Pexp_ident.txt = \"=>\": matched\n" ^
+                          "** args: () ");
+
+           Exp.function_ ~loc:Location.none ~attrs:[]
+            [{ pc_lhs = mkpat_unit Location.none;
+               pc_guard = None;
+               pc_rhs = body;
+            }]
+
+      (* 1-arity lambda *)
       | {
           pexp_desc = Pexp_apply
           (
@@ -36,7 +55,7 @@ let getenv_mapper argv =
           )
         }
         -> print_endline ("** Pexp_apply/Pexp_ident.txt = \"=>\": matched\n" ^
-                          "** v0 = " ^ v0);
+                          "** args: v0 = " ^ v0);
 
            Exp.function_ ~loc:Location.none ~attrs:[]
             [{ pc_lhs = mkpat_txt v0 Location.none;
