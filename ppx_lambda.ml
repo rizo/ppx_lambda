@@ -29,17 +29,6 @@ let lambda_mapper argv =
       let arg0_pat = Pat.var (mkloc arg0 arg0_loc) in
       Exp.fun_ "" None arg0_pat e0
 
-    (* Sequence mapper:
-     *   `arg0 => e0; e1; ... ; en` -> `fun arg0 -> e0; e1; ...; en`
-     *)
-    | Pexp_sequence ({pexp_desc =
-        Pexp_apply ({pexp_desc = Pexp_ident {txt = Lident "=>"}},
-        [("", {pexp_desc = Pexp_ident {txt = Lident arg0; loc = arg0_loc}});
-          ("", e0)])}, e1) ->
-      let arg0_pat = Pat.var (mkloc arg0 arg0_loc) in
-      let seq_expr = Exp.sequence e0 e1 in
-      Exp.fun_ "" None arg0_pat seq_expr
-
     (* default expr *)
     | _ -> super.expr this e
 
