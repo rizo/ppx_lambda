@@ -4,11 +4,11 @@ ppx_lambda
 Simplified lambda syntax extension for OCaml.
 
 ```ocaml
+let obtain_number = () => 42
 let inc = x => x + 1
-
 let ignore = (x) => 42
-
 let hello = name => "Hello, " ^ name ^ "!"
+let sum = x y => x + y
 
 
 let test () =
@@ -19,5 +19,6 @@ let test () =
     assert (ignore true = 42);
     assert (ignore () = 42);
     assert (hello "Bob" = "Hello, Bob!");
-    assert (((x => x + 1) 1) = 2)
+    assert (((x => x + 1) 1) = 2);
+    assert (sum 2 3 = 5)
 ```

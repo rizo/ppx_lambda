@@ -12,6 +12,7 @@ let seq_lambda1 = x => x, 42
 let seq_lambda2 = x => (x, 42)
 
 let three_sum = x y z => x + y + z
+let sum = x y => x + y
 
 let test () =
     assert (obtain_number () = 42);
@@ -31,7 +32,8 @@ let test () =
     end;
     assert (seq_lambda2 0 = (0, 42));
     assert (three_sum 1 2 3 = 6);
-    assert ((x y => x + y) 2 3 = 5)
+    assert ((x y => x + y) 2 3 = 5);
+    assert (sum 2 3 = 5)
 
 
 let () = test ()
