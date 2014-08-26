@@ -1,8 +1,9 @@
 
-(* 0-arity lambdas. *)
+(* 0-ary lambdas. *)
 let obtain_number = () => 42
+let obtain_unit = () => ()
 
-(* 1-arity lambdas. *)
+(* 1-ary lambdas. *)
 let inc = x => x + 1
 let ignore = (x) => 42
 let hello = name => "Hello, " ^ name ^ "!"
@@ -10,6 +11,7 @@ let hello = name => "Hello, " ^ name ^ "!"
 
 let test () =
     assert (obtain_number () = 42);
+    assert (obtain_unit () = ());
     assert (inc 1 = 2);
     assert (inc 101 = 102);
     assert (inc (-1) = 0);

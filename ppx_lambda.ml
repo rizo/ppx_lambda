@@ -23,59 +23,44 @@ let mkpat_txt (txt : string) (loc : Location.t) =
   Pat.mk ~loc (Ppat_var { txt; loc })
 
 
-let getenv_mapper argv =
-  { default_mapper with
-    expr = fun mapper expr ->
-      match expr with
-      (* 0-arity lambda *)
-      | {
-          pexp_desc = Pexp_apply
-          (
-            { pexp_desc = Pexp_ident { txt = Lident "=>" } },
-            ("", { pexp_desc = Pexp_construct ({ txt = Lident "()" }, None) }) ::
-            ("", body) :: rest
-          )
-        }
-        -> print_endline ("** Pexp_apply/Pexp_ident.txt = \"=>\": matched\n" ^
-                          "** args: () ");
 
-           Exp.function_ ~loc:Location.none ~attrs:[]
-            [{ pc_lhs = mkpat_unit Location.none;
-               pc_guard = None;
-               pc_rhs = body;
-            }]
+let create_apply_expr ident exprs =
+  Pexp_apply
+    ({pexp_desc = Pexp_ident {txt = Lident ident; loc = Location.none};
+      pexp_loc = Location.none;
+      pexp_attributes = []},
 
-      (* 1-arity lambda *)
-      | {
-          pexp_desc = Pexp_apply
-          (
-            { pexp_desc = Pexp_ident { txt = Lident "=>" } },
-            ("", { pexp_desc = Pexp_ident { txt = Lident v0 } }) ::
-            ("", body) :: rest
-          )
-        }
-        -> print_endline ("** Pexp_apply/Pexp_ident.txt = \"=>\": matched\n" ^
-                          "** args: v0 = " ^ v0);
+      List.map (fun e -> ("", e)) exprs)
 
-           Exp.function_ ~loc:Location.none ~attrs:[]
-            [{ pc_lhs = mkpat_txt v0 Location.none;
-               pc_guard = None;
-               pc_rhs = body;
-            }]
-           (* Exp.constant (Const_string ("hello :D", None)) *)
 
-      (* | { pexp_desc = Pexp_apply
-          ({ pexp_desc = Pexp_ident { txt = Lident "~>" } }, [_, body])}
-        ->
-          let {pexp_desc; pexp_loc} = body in
-          
-          Exp.function_ ~loc:pexp_loc ~attrs:[]
-            [{ pc_lhs = mkpat_unit pexp_loc;
-               pc_guard = None;
-               pc_rhs = body; }]
-        (* -> Exp.constant (Const_string ("hello :D", None)) *) *)
-      | x -> default_mapper.expr mapper x;
-  }
+let lambda_mapper =
+  fun mapper expr -> match expr with
+
+  (*
+   * 1-ary Lambda Mapper
+   *)
+
+  (*
+   * ~op_l0:(fn_e0 => fn_e1) && ~op_l1:op_e1
+   *)
+  | {pexp_desc =
+      Pexp_apply ({pexp_desc = Pexp_ident {txt = Lident op}},
+       [(op_l0,
+         {pexp_desc =
+           Pexp_apply ({pexp_desc = Pexp_ident {txt = Lident "=>"}},
+            [("", {pexp_desc = Pexp_ident {txt = Lident fn_e0}});
+             ("", fn_e1)])});
+        (op_l1, op_e1)])} when (op = "&&" || op = "&" || op = "||" || op = "or")
+    ->
+    let op_ident = (Exp.ident (mknoloc (Lident op))) in
+    let lambda_body = (Exp.apply op_ident [("", fn_e1); ("", op_e1)]) in
+    Exp.fun_ "" None (Pat.var (mknoloc fn_e0)) lambda_body
+
+  (* Pass `expr` to default mapper. *)
+  | x -> default_mapper.expr mapper x
+
+
+let getenv_mapper argv = { default_mapper with expr = lambda_mapper }
 
 let () = run_main getenv_mapper
 
