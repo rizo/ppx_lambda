@@ -20,5 +20,6 @@ let test () =
     assert (ignore () = 42);
     assert (hello "Bob" = "Hello, Bob!");
     assert (((x => x + 1) 1) = 2);
-    assert (sum 2 3 = 5)
+    assert (sum 2 3 = 5);
+    assert ((List.map (x => x * x) [1; 2; 3]) = [1; 4; 9]);
 ```
