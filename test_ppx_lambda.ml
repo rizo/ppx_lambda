@@ -8,6 +8,9 @@ let inc = x => x + 1
 let ignore = (x) => 42
 let hello = name => "Hello, " ^ name ^ "!"
 
+let seq_lambda1 = x => x; 42
+let seq_lambda2 = (x => x); 42
+
 
 let test () =
     assert (obtain_number () = 42);
@@ -20,7 +23,9 @@ let test () =
     assert (ignore () = 42);
     assert (hello "Bob" = "Hello, Bob!");
     assert (((x => x + 1) 1) = 2);
-    assert ((List.map (x => x * x) [1; 2; 3]) = [1; 4; 9])
+    assert ((List.map (x => x * x) [1; 2; 3]) = [1; 4; 9]);
+    assert (seq_lambda1 5 = 42);
+    assert (seq_lambda2 5 = 42)
 
 
 let demo () =
